@@ -1,9 +1,9 @@
 # CardDetection
 
-CardDetection is a machine learning project designed to detect and identify cards from images. This project utilizes convolutional neural networks (CNNs) to accurately segment cards in the images.
+CardDetection is a machine learning project designed to detect and identify cards from images. This project utilizes convolutional neural networks (CNNs) to accurately segment cards in the images.<br>
+Study can be found here.[Link](https://docs.google.com/document/d/1LcH3sPBC4z1XQjxqd-VuX1qwOjHC4hexfbK-bxqq2mQ/edit#heading=h.oznfwcrw719g)
 
 The dataset used is [midv-500](https://github.com/fcakyon/midv500)
-
 
 ## Requirements
 * Python 3.9.x
