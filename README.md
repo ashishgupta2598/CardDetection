@@ -71,12 +71,12 @@ Here is a sample configuration:
 ```
 
 ## To train the model, run the following command:
-```
+```types
 python3 main.py config_files/e_FPN_mobilenet_v2.json
 ```
 
 ## For Inference or Web-Based Tool
-**Note**: The inference is run using [streamlit](https://streamlit.io/). Prepare the data un mask and images folders and replace the paths in the script accordingly.
+**Note**: The inference is run using [streamlit](https://streamlit.io/). Prepare the data in mask and images folders and replace the paths in the script accordingly.
 
 To run the inference, use the command:
 ```
