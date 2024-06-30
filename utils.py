@@ -9,15 +9,21 @@ from PIL import Image
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def create_df(IMAGE_PATH):
+def create_df(IMAGE_PATH,only_df=False):
+    """Create a DataFrame or NumPy array of filenames (without extensions) from a specified directory."""
+    
     name = []
     for dirname, _, filenames in os.walk(IMAGE_PATH):
         for filename in filenames:
             name.append(filename.split('.')[0])
+    if only_df:
+        return pd.DataFrame({'id': name}, index = np.arange(0, len(name)))
     
     return pd.DataFrame({'id': name}, index = np.arange(0, len(name))).to_numpy().ravel()
 
 def pixel_accuracy(output, mask):
+    """Calculate pixel accuracy between a predicted segmentation mask and a ground truth mask."""
+
     with torch.no_grad():
         output = torch.argmax(F.softmax(output, dim=1), dim=1)
         correct = torch.eq(output, mask).int()
@@ -26,6 +32,7 @@ def pixel_accuracy(output, mask):
 
 
 def dice_coef(pred_mask,groundtruth_mask):
+    """Compute the Dice coefficient (F1 score) between a predicted segmentation mask and a ground truth mask."""
     pred_mask = F.softmax(pred_mask, dim=1)
     pred_mask = torch.argmax(pred_mask, dim=1)
 
@@ -39,6 +46,8 @@ def dice_coef(pred_mask,groundtruth_mask):
 
 
 def mIoU(pred_mask, mask, smooth=1e-10, n_classes=2):
+    """Compute mean Intersection over Union (mIoU) for a predicted segmentation mask compared to a ground truth mask."""
+
     with torch.no_grad():
         pred_mask = F.softmax(pred_mask, dim=1)
         pred_mask = torch.argmax(pred_mask, dim=1)
@@ -61,13 +70,14 @@ def mIoU(pred_mask, mask, smooth=1e-10, n_classes=2):
         
         return np.nanmean(iou_per_class)
 
-
-
 def get_lr(optimizer):
+    """Get the current learning rate from a PyTorch optimizer."""
     for param_group in optimizer.param_groups:
         return param_group['lr']
 
 def predict_image_mask_miou(model, image, mask, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+    """Predict the mask for an input image using a deep learning model and compute pixel accuracy."""
+
     model.eval()
     model.to(device); image=image.to(device)
     mask = mask.to(device)
@@ -83,6 +93,8 @@ def predict_image_mask_miou(model, image, mask, mean=[0.485, 0.456, 0.406], std=
     return masked, score
 
 def predict_image_mask_pixel(model, image, mask, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+    """ Predict the mask for an input image using a deep learning model and compute pixel accuracy."""
+
     model.eval()
     model.to(device); image=image.to(device)
     mask = mask.to(device)
@@ -98,6 +110,8 @@ def predict_image_mask_pixel(model, image, mask, mean=[0.485, 0.456, 0.406], std
     return masked, acc
 
 def miou_dice_score(model, test_set):
+    """Calculate mean Intersection over Union (mIoU) and Dice coefficient for a deep learning model on a test dataset."""
+
     score_iou = []
     dice_score = []
     for i in tqdm(range(len(test_set))):
@@ -110,6 +124,8 @@ def miou_dice_score(model, test_set):
     return score_iou,dice_score
 
 def pixel_acc(model, test_set):
+    """Calculate pixel accuracy for a deep learning model on a test dataset."""
+
     accuracy = []
     for i in tqdm(range(len(test_set))):
         img, mask = test_set[i]
@@ -117,7 +133,9 @@ def pixel_acc(model, test_set):
         accuracy.append(acc)
     return accuracy
 
-def calculate_per_id_card_materics(model,dataloader):
+def calculate_different_id_card_materics(model,dataloader):
+    """Evaluate a deep learning model on different categories of ID card types using various metrics."""
+
     categories = ['id', 'passport', 'drvlic', 'other']
     mask_dict = {"id":[],"passport":[],"drvlic":[],"other":[]} 
     output_dict = {"id":[],"passport":[],"drvlic":[],"other":[]} 
@@ -142,13 +160,6 @@ def calculate_per_id_card_materics(model,dataloader):
                 mask_dict[type_of_id[type]].append(mask[type])
                 output_dict[type_of_id[type]].append(output[type])
             
-            if i==4:
-                break
-                
-            #This should return a dict containing the result. So add them and in the end present a df table.
-            # it will be 2D matrics.....*****
-
-            #THese means will return a single value...but we want to return whoel value hence modify these functions.
     losses = {}
     for category in categories:
         masks = torch.stack(mask_dict[category])
@@ -173,33 +184,14 @@ def calculate_per_id_card_materics(model,dataloader):
     print(result_df.round(3))
     print()
 
-    # losses = {
-    #     "id":
-    #           {"iou_score": iou_score['id'], "dice_score": dice_score['id'] , "pixel_acc": pixel_acc['id']},
-    #     "passport":
-    #           {"iou_score": iou_score['passport'], "dice_score": dice_score['passport'] , "pixel_acc": pixel_acc['passport']} ,
-    #     "drvlic":
-    #             {"iou_score": iou_score['drvlic'], "dice_score": dice_score['drvlic'] , "pixel_acc": pixel_acc['drvlic']},
-    #     "other":
-    #             {"iou_score": iou_score['other'], "dice_score": dice_score['other'] , "pixel_acc": pixel_acc['other']}
-    #             } 
-
-    
-
 def tensor_to_pil(tensor):
-  """Converts a PyTorch tensor to a PIL image.
+  """Converts a PyTorch tensor to a PIL image."""
 
-  Args:
-      tensor: A PyTorch tensor of shape [3, H, W] representing an RGB image.
-
-  Returns:
-      A PIL Image object.
-  """
   if not isinstance(tensor, torch.Tensor):
     raise TypeError("Input must be a PyTorch tensor.")
 
-  tensor = tensor.clone().detach()  # Avoid modifying the original tensor
-  tensor = tensor.squeeze(0)  # Remove batch dimension if present
+  tensor = tensor.clone().detach() 
+  tensor = tensor.squeeze(0)  
   unnormalized = tensor * 255.0  # Un-normalize from [0, 1] to [0, 255]
   image = Image.fromarray(unnormalized.cpu().numpy().astype(np.uint8))
   # Convert to RGB mode if necessary (depending on tensor format)
@@ -209,15 +201,8 @@ def tensor_to_pil(tensor):
 
 
 def convert_grayscale_to_rgb(grayscale_image):
-  """Converts a grayscale image to RGB format.
+  """Converts a grayscale image to RGB format."""
 
-  Args:
-      grayscale_image: A PIL Image object in grayscale mode.
-
-  Returns:
-      A PIL Image object in RGB mode.
-  # """
-  # Create a new RGB image with the same dimensions as the grayscale image
   rgb_image = grayscale_image.convert('RGB')
   return rgb_image
 

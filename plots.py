@@ -10,8 +10,8 @@ def plot_loss(history):
     plt.show()
     
 def plot_score(history):
-    plt.plot(history['train_miou'], label='train_mIoU', marker='*')
-    plt.plot(history['val_miou'], label='val_mIoU',  marker='*')
+    plt.plot(history['train_iou'], label='train_mIoU', marker='*')
+    plt.plot(history['val_iou'], label='val_mIoU',  marker='*')
     plt.title('Score per epoch'); plt.ylabel('mean IoU')
     plt.xlabel('epoch')
     plt.legend(), plt.grid()

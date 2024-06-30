@@ -9,7 +9,7 @@ class SegmentationModel(nn.Module):
   """
   A class for loading various segmentation models from segmentation_models_pytorch.
   """
-  
+
   def __init__(self, model_name='unet',encoder_name='mobilenet_v2', classes=2, activation=None, encoder_depth=5, decoder_channels=[256, 128, 64, 32, 16]):
     super(SegmentationModel, self).__init__()
 
@@ -35,7 +35,7 @@ class SegmentationModel(nn.Module):
     # Create the model instance with provided arguments
     self.model = encoder_class(
       encoder_name=encoder_name,
-      classes=classes,
+      classes=classes, #can be one also ...**
       activation=activation,
       encoder_depth=encoder_depth,
       decoder_channels=decoder_channels

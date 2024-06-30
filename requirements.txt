@@ -1,0 +1,9 @@
+streamlit==1.36.0
+torch==2.3.1
+torchvision==0.18.1
+segmentation-models-pytorch==0.3.3
+scikit-learn==1.5.0
+matplotlib==3.9.0
+tqdm==4.66.4
+
+
