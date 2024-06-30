@@ -1,3 +1,7 @@
+# CardDetection
+
+CardDetection is a machine learning project designed to detect and identify cards from images. This project utilizes convolutional neural networks (CNNs) to accurately segment cards in the images.
+
 ## Requirements
 * Python 3.9.x
 * streamlit==1.36.0
@@ -8,25 +12,23 @@
 * scikit-learn==1.5.0
 * matplotlib==3.9.0
 * tqdm==4.66.4
-Please install the following dependecies.
 
+Please install the following dependencies:
 ```
 pip3 install -r requirements.txt
 ```
 
-## Datasets
-
-The datasets that are used is [midv_500](https://github.com/fcakyon/midv500)
-The data can be prepared using 
+## Preapre the data using
 ```
 data_preps.ipynb
 ```
+This will divide the folder into images and masks and create data split by train-->70%, val--> 15%, test-->15%.
 
-## How to train model
-To train the model check the config files. It contains a series of parameters to check.
-```
-config_files/e_unet_res18.json
-```
+
+## How to Train the Model
+To train the model, check the config files. These files contain a series of parameters to configure the training process. An example configuration file is ```config_files/e_unet_res18.json```
+
+Here is a sample configuration:
 ```
 {
   "paths": {
@@ -53,9 +55,8 @@ config_files/e_unet_res18.json
     "max_lr": 0.001,
     "epochs": 15,
     "weight_decay": 0.0001,
-    "l2_reg_bool":false,
-    "lambda_l2":0.001
-
+    "l2_reg_bool": false,
+    "lambda_l2": 0.001
   },
   "model": {
     "model_name": "unet",
@@ -68,28 +69,19 @@ config_files/e_unet_res18.json
   }
 }
 ```
-And the command to train is:
+
+## To train the model, run the following command:
 ```
 python3 main.py config_files/e_FPN_mobilenet_v2.json
 ```
 
+## For Inference or Web-Based Tool
+**Note**: The inference is run using [streamlit](https://streamlit.io/). Prepare the data un mask and images folders and replace the paths in the script accordingly.
 
+To run the inference, use the command:
 ```
-python3 main.py --model_path='save_models' --experiment='english' --epochs=70 --batch_size=75
-```
-
-## For inference 
-`Note`: Please note that the results reported in our paper are averaged over 4 runs.
-```
-python3 main.py --model_path='save_models' --experiment='english' --training= False
+streamlit run inference.py
 ```
 
-## Data annotation framework
-If you are interested in our data annotation framework, you can check [`Annotation_Framework`](https://github.com/hrishikeshrt/classification-annotation) for the more details.
 
-## Web-based tool
-This can be run using the command
-```
-streamlit run inference.py 
-```
 
