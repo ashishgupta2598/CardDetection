@@ -33,7 +33,6 @@ def pixel_accuracy(output, mask):
 
 def dice_coef(pred_mask,groundtruth_mask):
     """Compute the Dice coefficient (F1 score) between a predicted segmentation mask and a ground truth mask."""
-    pred_mask = F.softmax(pred_mask, dim=1)
     pred_mask = torch.argmax(pred_mask, dim=1)
 
     pred_mask = pred_mask.contiguous().view(-1)
