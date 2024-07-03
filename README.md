@@ -64,7 +64,7 @@ Here is a sample configuration:
   "model": {
     "model_name": "unet",
     "encoder_name": "resnet18", 
-    "classes": 2,
+    "classes": 1,
     "activation": "sigmoid",
     "encoder_depth": 5,
     "decoder_channels": [256, 128, 64, 32, 16],
